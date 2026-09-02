@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: print-job-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: print-job-service
+  template:
+    metadata:
+      labels:
+        app: print-job-service
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: print-job-service
+          image: print-job-service:0.0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: postgres
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: printservice
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: print-job-service-db
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: print-job-service-db
+                  key: password
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+              ephemeral-storage: 512Mi
+            limits:
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: print-job-service
+spec:
+  selector:
+    app: print-job-service
+  ports:
+    - port: 8080
+      targetPort: http
+  type: ClusterIP
