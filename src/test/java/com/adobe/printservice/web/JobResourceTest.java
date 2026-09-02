@@ -1,7 +1,7 @@
 package com.adobe.printservice.web;
 
 import com.adobe.printservice.model.Job;
-import com.adobe.printservice.model.JobStatus;
+import com.adobe.printservice.model.JobMother;
 import com.adobe.printservice.repository.JobRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class JobResourceTest {
-
-    private static final String INVOICE_TEMPLATE_ID = "b6f1e6a2-6b8b-4a9d-9c2e-3f2d8a2f9b10";
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,10 +44,10 @@ class JobResourceTest {
                                   "status": "DONE",
                                   "attempts": 99
                                 }
-                                """.formatted(INVOICE_TEMPLATE_ID)))
+                                """.formatted(JobMother.INVOICE_TEMPLATE_ID)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.templateId").value(INVOICE_TEMPLATE_ID))
+                .andExpect(jsonPath("$.templateId").value(JobMother.INVOICE_TEMPLATE_ID))
                 .andExpect(jsonPath("$.status").value("QUEUED"))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty())
                 .andExpect(jsonPath("$.updatedAt").isNotEmpty());
@@ -57,9 +55,7 @@ class JobResourceTest {
 
     @Test
     void getAllJobs_withStatus_returnsOnlyMatchingJobs() throws Exception {
-        Job failedJob = new Job();
-        failedJob.setTemplateId(INVOICE_TEMPLATE_ID);
-        failedJob.setStatus(JobStatus.FAILED);
+        Job failedJob = JobMother.failedJob();
         jobRepository.save(failedJob);
 
         mockMvc.perform(get("/jobs").param("status", "FAILED"))
@@ -76,39 +72,31 @@ class JobResourceTest {
 
     @Test
     void getResult_whenJobIsDone_returnsResultContent() throws Exception {
-        Job doneJob = new Job();
-        doneJob.setTemplateId(INVOICE_TEMPLATE_ID);
-        doneJob.setStatus(JobStatus.DONE);
-        doneJob.setResultContent("Rendered invoice");
+        Job doneJob = JobMother.doneJob();
         jobRepository.save(doneJob);
 
         mockMvc.perform(get("/jobs/{id}/result", doneJob.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("DONE"))
-                .andExpect(jsonPath("$.resultContent").value("Rendered invoice"))
+                .andExpect(jsonPath("$.resultContent").value(JobMother.RENDERED_INVOICE))
                 .andExpect(jsonPath("$.errorContent").doesNotExist());
     }
 
     @Test
     void getResult_whenJobFailed_returnsErrorContent() throws Exception {
-        Job failedJob = new Job();
-        failedJob.setTemplateId(INVOICE_TEMPLATE_ID);
-        failedJob.setStatus(JobStatus.FAILED);
-        failedJob.setErrorMessage("Renderer unavailable");
+        Job failedJob = JobMother.failedJob();
         jobRepository.save(failedJob);
 
         mockMvc.perform(get("/jobs/{id}/result", failedJob.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("FAILED"))
-                .andExpect(jsonPath("$.errorContent").value("Renderer unavailable"))
+                .andExpect(jsonPath("$.errorContent").value(JobMother.RENDERER_UNAVAILABLE))
                 .andExpect(jsonPath("$.resultContent").doesNotExist());
     }
 
     @Test
     void getResult_whenJobIsProcessing_returnsOnlyStatus() throws Exception {
-        Job processingJob = new Job();
-        processingJob.setTemplateId(INVOICE_TEMPLATE_ID);
-        processingJob.setStatus(JobStatus.PROCESSING);
+        Job processingJob = JobMother.processingJob();
         jobRepository.save(processingJob);
 
         mockMvc.perform(get("/jobs/{id}/result", processingJob.getId()))
