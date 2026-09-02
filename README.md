@@ -81,6 +81,23 @@ need to build template management. Your job is to implement the render job lifec
 We're not going to tell you how to implement the queue/worker, the retry policy, or what your
 readiness check should verify - that's for you to decide.
 
+### Design Decisions
+
+- `JobResource` exposes the job REST endpoints.
+- `JobProcessor` polls and processes queued jobs asynchronously.
+- `Rendering` simulates document rendering; it does not generate a real document.
+- Spring Boot Actuator provides liveness, readiness, and application-info endpoints.
+- Docker Compose runs the application alongside PostgreSQL locally.
+- PostgreSQL locking prevents two application instances from processing the same job.
+- Added a Kubernetes manifest with deployment, service, and health probes.
+
+### Operational endpoints
+
+- Liveness: `GET /actuator/health/liveness`
+- Readiness: `GET /actuator/health/readiness` — verifies Spring's readiness state and the
+  PostgreSQL connection.
+- Application info: `GET /actuator/info` — app metadata plus Java, OS, and process details.
+- Job metrics: `GET /jobs/metrics`
 
 ### Optional (not required to complete the exercise)
 
