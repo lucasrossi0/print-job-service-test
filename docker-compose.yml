@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: printservice
+      POSTGRES_USER: printservice
+      POSTGRES_PASSWORD: printservice
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U printservice -d printservice"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  app:
+    build: .
+    ports:
+      - target: 8080
+        published: "8080-8081"
+    deploy:
+      replicas: 2
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: printservice
+      DB_USER: printservice
+      DB_PASSWORD: printservice
+    depends_on:
+      postgres:
+        condition: service_healthy
+volumes:
+  postgres-data:
