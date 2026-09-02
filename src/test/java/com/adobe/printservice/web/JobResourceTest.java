@@ -73,4 +73,48 @@ class JobResourceTest {
         mockMvc.perform(get("/jobs/{id}/result", "does-not-exist"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void getResult_whenJobIsDone_returnsResultContent() throws Exception {
+        Job doneJob = new Job();
+        doneJob.setTemplateId(INVOICE_TEMPLATE_ID);
+        doneJob.setStatus(JobStatus.DONE);
+        doneJob.setResultContent("Rendered invoice");
+        jobRepository.save(doneJob);
+
+        mockMvc.perform(get("/jobs/{id}/result", doneJob.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("DONE"))
+                .andExpect(jsonPath("$.resultContent").value("Rendered invoice"))
+                .andExpect(jsonPath("$.errorContent").doesNotExist());
+    }
+
+    @Test
+    void getResult_whenJobFailed_returnsErrorContent() throws Exception {
+        Job failedJob = new Job();
+        failedJob.setTemplateId(INVOICE_TEMPLATE_ID);
+        failedJob.setStatus(JobStatus.FAILED);
+        failedJob.setErrorMessage("Renderer unavailable");
+        jobRepository.save(failedJob);
+
+        mockMvc.perform(get("/jobs/{id}/result", failedJob.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andExpect(jsonPath("$.errorContent").value("Renderer unavailable"))
+                .andExpect(jsonPath("$.resultContent").doesNotExist());
+    }
+
+    @Test
+    void getResult_whenJobIsProcessing_returnsOnlyStatus() throws Exception {
+        Job processingJob = new Job();
+        processingJob.setTemplateId(INVOICE_TEMPLATE_ID);
+        processingJob.setStatus(JobStatus.PROCESSING);
+        jobRepository.save(processingJob);
+
+        mockMvc.perform(get("/jobs/{id}/result", processingJob.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PROCESSING"))
+                .andExpect(jsonPath("$.errorContent").doesNotExist())
+                .andExpect(jsonPath("$.resultContent").doesNotExist());
+    }
 }

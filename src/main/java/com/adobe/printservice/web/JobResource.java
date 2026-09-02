@@ -5,6 +5,7 @@ import com.adobe.printservice.repository.JobRepository;
 import com.adobe.printservice.repository.RenderTemplateRepository;
 import com.adobe.printservice.web.api.JobInputApi;
 import com.adobe.printservice.web.api.JobOutputApi;
+import com.adobe.printservice.web.api.JobResultOutput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,9 +62,9 @@ public class JobResource{
     }
 
     @GetMapping("/{id}/result")
-    public ResponseEntity<JobOutputApi> getResult(@PathVariable String id){
+    public ResponseEntity<JobResultOutput> getResult(@PathVariable String id){
         return jobRepository.findById(id)
-                .map(JobOutputApi::fromJob)
+                .map(JobResultOutput::fromJob)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, JOB_NOT_FOUND));
     }
