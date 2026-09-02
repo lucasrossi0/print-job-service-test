@@ -16,6 +16,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @RequiredArgsConstructor
 public class JobProcessor {
 
+    private static final int MAX_ATTEMPTS = 3;
+
     private final JobRepository jobRepository;
     private final Rendering rendering;
     private final TransactionTemplate transactionTemplate;
@@ -60,7 +62,7 @@ public class JobProcessor {
     }
 
     private void handleFailure(Job job, RuntimeException exception) {
-        if (job.getAttempts() < maxAttempts(job)) {
+        if (job.getAttempts() < MAX_ATTEMPTS) {
             job.setStatus(JobStatus.QUEUED);
         } else {
             job.setStatus(JobStatus.FAILED);
@@ -74,7 +76,4 @@ public class JobProcessor {
         jobRepository.save(job);
     }
 
-    private int maxAttempts(Job job) {
-        return 3 + Math.floorMod(job.getId().hashCode(), 4);
-    }
 }

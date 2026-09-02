@@ -53,7 +53,7 @@ public class JobResource{
 
     @PostMapping
     public ResponseEntity<JobOutputApi> createJob(@RequestBody JobInputApi jobInputApi){
-        if (jobInputApi.getTemplateId() == null || !renderTemplateRepository.existsById(jobInputApi.getTemplateId())) {
+        if (jobInputApi.templateId() == null || !renderTemplateRepository.existsById(jobInputApi.templateId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, TEMPLATE_NOT_FOUND);
         }
 
