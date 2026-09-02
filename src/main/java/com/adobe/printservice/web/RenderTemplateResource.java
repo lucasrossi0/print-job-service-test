@@ -1,7 +1,8 @@
 package com.adobe.printservice.web;
 
-import com.adobe.printservice.model.RenderTemplate;
 import com.adobe.printservice.repository.RenderTemplateRepository;
+import com.adobe.printservice.web.api.RenderTemplateApiOutput;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,22 +13,22 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/templates")
+@RequiredArgsConstructor
 public class RenderTemplateResource {
 
     private final RenderTemplateRepository renderTemplateRepository;
 
-    public RenderTemplateResource(RenderTemplateRepository renderTemplateRepository) {
-        this.renderTemplateRepository = renderTemplateRepository;
-    }
-
     @GetMapping
-    public List<RenderTemplate> getTemplates() {
-        return renderTemplateRepository.findAll();
+    public ResponseEntity<List<RenderTemplateApiOutput>> getTemplates() {
+        return ResponseEntity.ok(renderTemplateRepository.findAll().stream()
+                .map(RenderTemplateApiOutput::fromRenderTemplate)
+                .toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RenderTemplate> getTemplate(@PathVariable String id) {
+    public ResponseEntity<RenderTemplateApiOutput> getTemplate(@PathVariable String id) {
         return renderTemplateRepository.findById(id)
+                .map(RenderTemplateApiOutput::fromRenderTemplate)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
