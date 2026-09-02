@@ -42,7 +42,7 @@ public class JobResource{
     }
 
     @GetMapping("/metrics")
-    public ResponseEntity<Map<JobStatus, Long>> getMetrics(){
+    public ResponseEntity<Map<JobStatus, Long>> getJobsMetrics(){
         return ResponseEntity.ok(Map.of(
                 JobStatus.QUEUED, jobRepository.countByStatus(JobStatus.QUEUED),
                 JobStatus.PROCESSING, jobRepository.countByStatus(JobStatus.PROCESSING),
@@ -62,7 +62,7 @@ public class JobResource{
     }
 
     @GetMapping("/{id}/result")
-    public ResponseEntity<JobResultOutput> getResult(@PathVariable String id){
+    public ResponseEntity<JobResultOutput> getJobResult(@PathVariable String id){
         return jobRepository.findById(id)
                 .map(JobResultOutput::fromJob)
                 .map(ResponseEntity::ok)
