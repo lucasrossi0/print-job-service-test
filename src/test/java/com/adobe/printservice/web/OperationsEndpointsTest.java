@@ -32,6 +32,15 @@ class OperationsEndpointsTest {
     }
 
     @Test
+    void info_returnsApplicationMetadata() throws Exception {
+        mockMvc.perform(get("/actuator/info"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.app.name").value("print-job-service"))
+                .andExpect(jsonPath("$.app.version").value("0.0.1-SNAPSHOT"))
+                .andExpect(jsonPath("$.app.database").value("PostgreSQL"));
+    }
+
+    @Test
     void metrics_returnsAJobCountForEachStatus() throws Exception {
         mockMvc.perform(get("/jobs/metrics"))
                 .andExpect(status().isOk())
