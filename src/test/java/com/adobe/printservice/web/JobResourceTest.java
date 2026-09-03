@@ -90,7 +90,7 @@ class JobResourceTest {
         mockMvc.perform(get("/jobs/{id}/result", failedJob.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("FAILED"))
-                .andExpect(jsonPath("$.errorContent").value(JobMother.RENDERER_UNAVAILABLE))
+                .andExpect(jsonPath("$.errorContent").value(JobMother.RENDERING_FAILURE))
                 .andExpect(jsonPath("$.resultContent").doesNotExist());
     }
 

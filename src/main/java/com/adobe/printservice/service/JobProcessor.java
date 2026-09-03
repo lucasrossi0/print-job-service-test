@@ -5,14 +5,13 @@ import com.adobe.printservice.model.JobStatus;
 import com.adobe.printservice.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class JobProcessor {
 
@@ -23,10 +22,10 @@ public class JobProcessor {
     private final TransactionTemplate transactionTemplate;
     
     @Scheduled(fixedDelay = 1000)
-    public void working() {
+    public void processJob() {
         claimNextJob().ifPresent(job -> {
             try {
-                completeJob(job, render(job));
+                completeJob(job, rendering.renderDocument(job));
             } catch (RuntimeException exception) {
                 handleFailure(job, exception);
             }
@@ -44,21 +43,14 @@ public class JobProcessor {
     private void updateToProcessing(Job job) {
         job.setStatus(JobStatus.PROCESSING);
         job.setAttempts(job.getAttempts() + 1);
-        save(job);
-    }
-
-    private String render(Job job) {
-        if (ThreadLocalRandom.current().nextInt(10) < 3) {
-            throw new IllegalStateException("Simulated transient rendering failure");
-        }
-        return rendering.renderDocument(job);
+        saveJob(job);
     }
 
     private void completeJob(Job job, String result) {
         job.setResultContent(result);
         job.setStatus(JobStatus.DONE);
         job.setErrorMessage(null);
-        save(job);
+        saveJob(job);
     }
 
     private void handleFailure(Job job, RuntimeException exception) {
@@ -68,10 +60,10 @@ public class JobProcessor {
             job.setStatus(JobStatus.FAILED);
             job.setErrorMessage(exception.getMessage());
         }
-        save(job);
+        saveJob(job);
     }
 
-    private void save(Job job) {
+    private void saveJob(Job job) {
         job.setUpdatedAt(Instant.now());
         jobRepository.save(job);
     }
