@@ -67,7 +67,8 @@ class JobResourceTest {
     @Test
     void getResult_withUnknownId_returns404() throws Exception {
         mockMvc.perform(get("/jobs/{id}/result", "does-not-exist"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("Job not found"));
     }
 
     @Test
