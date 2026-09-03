@@ -94,6 +94,7 @@ readiness check should verify - that's for you to decide.
 ### Job endpoints
 
 - Create a job: `POST /jobs`
+- Get job status: `GET /jobs/{id}`
 - List all jobs: `GET /jobs`
 - Filter jobs by status: `GET /jobs?status={QUEUED|PROCESSING|DONE|FAILED}`
 - Get a job result: `GET /jobs/{id}/result`
