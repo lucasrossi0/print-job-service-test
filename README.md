@@ -85,6 +85,7 @@ readiness check should verify - that's for you to decide.
 
 - `JobResource` exposes the job REST endpoints.
 - `JobProcessor` polls and processes queued jobs asynchronously.
+- Rendering failures are retried up to three times before the job is marked `FAILED`.
 - `Rendering` simulates document rendering; it does not generate a real document.
 - Spring Boot Actuator provides liveness, readiness, and application-info endpoints.
 - Docker Compose runs the application alongside PostgreSQL locally.
@@ -97,7 +98,8 @@ readiness check should verify - that's for you to decide.
 - Get job status: `GET /jobs/{id}`
 - List all jobs: `GET /jobs`
 - Filter jobs by status: `GET /jobs?status={QUEUED|PROCESSING|DONE|FAILED}`
-- Get a job result: `GET /jobs/{id}/result`
+- Get a job result: `GET /jobs/{id}/result` — returns `resultContent` when `DONE`, or
+  `errorContent` when `FAILED`.
 - Get job metrics: `GET /jobs/metrics`
 
 ### Operational endpoints
