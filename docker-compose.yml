@@ -12,13 +12,11 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
   app:
     build: .
     ports:
       - target: 8080
-        published: "8080-8082"
+        published: "${APP_PORTS:-8080}"
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -28,5 +26,3 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-volumes:
-  postgres-data:
