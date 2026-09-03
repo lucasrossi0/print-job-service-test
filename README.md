@@ -91,13 +91,19 @@ readiness check should verify - that's for you to decide.
 - PostgreSQL locking prevents two application instances from processing the same job.
 - Added a Kubernetes manifest with deployment, service, and health probes.
 
+### Job endpoints
+
+- Create a job: `POST /jobs`
+- List all jobs: `GET /jobs`
+- Filter jobs by status: `GET /jobs?status={QUEUED|PROCESSING|DONE|FAILED}`
+- Get a job result: `GET /jobs/{id}/result`
+- Get job metrics: `GET /jobs/metrics`
+
 ### Operational endpoints
 
 - Liveness: `GET /actuator/health/liveness`
-- Readiness: `GET /actuator/health/readiness` — verifies Spring's readiness state and the
-  PostgreSQL connection.
-- Application info: `GET /actuator/info` — app metadata plus Java, OS, and process details.
-- Job metrics: `GET /jobs/metrics`
+- Readiness: `GET /actuator/health/readiness` — verifies Spring's readiness state and the PostgreSQL connection.
+- Application info: `GET /actuator/info`
 
 ### Optional (not required to complete the exercise)
 
