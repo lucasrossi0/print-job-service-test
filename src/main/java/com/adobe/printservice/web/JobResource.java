@@ -58,7 +58,7 @@ public class JobResource{
         }
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(JobOutputApi.fromJob(jobRepository.save(jobInputApi.toJob())));
+                .body(JobOutputApi.fromCreatedJob(jobRepository.save(jobInputApi.toJob())));
     }
 
     @GetMapping("/{id}/result")
