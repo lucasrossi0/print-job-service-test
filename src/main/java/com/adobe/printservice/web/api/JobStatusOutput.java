@@ -15,7 +15,7 @@ public record JobStatusOutput(
         return new JobStatusOutput(
                 job.getStatus(),
                 job.getAttempts(),
-                job.getResultContent() != null,
+                (job.getResultContent() != null) || (job.getErrorMessage() != null),
                 job.getStatus() == JobStatus.FAILED ? job.getErrorMessage() : null
         );
     }

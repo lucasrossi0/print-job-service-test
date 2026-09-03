@@ -91,7 +91,7 @@ class JobResourceTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(STATUS_PATH).value(FAILED))
                 .andExpect(jsonPath(ATTEMPTS_PATH).value(3))
-                .andExpect(jsonPath(RESULT_AVAILABLE_PATH).value(false))
+                .andExpect(jsonPath(RESULT_AVAILABLE_PATH).value(true))
                 .andExpect(jsonPath(ERROR_MESSAGE_PATH).value(JobMother.RENDERING_FAILURE));
     }
 

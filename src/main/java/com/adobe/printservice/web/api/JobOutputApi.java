@@ -13,21 +13,11 @@ public record JobOutputApi(String id, String templateId, Map<String, Object> par
     public static JobOutputApi fromJob(Job job) {
         return new JobOutputApi(
                 job.getId(),
-                job.getTemplateId(),
-                job.getParameters(),
+                null,
+                null,
                 job.getStatus(),
                 job.getCreatedAt(),
                 job.getUpdatedAt()
         );
     }
-
-    public static JobOutputApi fromCreatedJob(Job job) {
-        return new JobOutputApi(
-                job.getId(),
-                null,
-                null,
-                job.getStatus(),
-                job.getCreatedAt(),
-                job.getUpdatedAt()
-        );    }
 }
