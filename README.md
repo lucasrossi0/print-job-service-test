@@ -109,7 +109,15 @@ readiness check should verify - that's for you to decide.
 ### Optional (not required to complete the exercise)
 
 - Demonstrate that running two instances of your app against the same database does not cause a
-  job to be processed twice.
+  job to be processed twice. Run two application replicas, sharing the same PostgreSQL container,
+  with:
+
+  ```shell
+  $ APP_PORTS=8080-8081 docker compose up --build --scale app=2
+  ```
+
+  `APP_PORTS` provides one host port per replica. Without it, the default `8080` port is used for
+  a single application instance.
 - A Kubernetes `Deployment`/`Service` manifest for this app (it does not need to be applied to a
   real cluster - we're interested in the manifest itself, e.g. how you wire up probes).
 
