@@ -24,7 +24,7 @@ public record JobOutputApi(String id, String templateId, Map<String, Object> par
     public static JobOutputApi fromCreatedJob(Job job) {
         return new JobOutputApi(
                 job.getId(),
-                job.getTemplateId(),
+                null,
                 null,
                 job.getStatus(),
                 job.getCreatedAt(),
