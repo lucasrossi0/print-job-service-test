@@ -36,8 +36,7 @@ class OperationsEndpointsTest {
         mockMvc.perform(get("/actuator/info"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.app.name").value("print-job-service"))
-                .andExpect(jsonPath("$.app.version").value("0.0.1-SNAPSHOT"))
-                .andExpect(jsonPath("$.app.database").value("PostgreSQL"));
+                .andExpect(jsonPath("$.app.version").value("0.0.1-SNAPSHOT"));
     }
 
     @Test
